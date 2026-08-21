@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>UniVista Early Access</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon-32.png" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <meta name="theme-color" content="#071018" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <aside>
+    <img src="icon-64.png" width="40" height="40" alt="" />
+    <strong>UniVista</strong>
+    <small>Early Access · INSAN CREATIONS</small>
+    <nav>
+      <button data-v="dash" class="on">Dashboard</button>
+      <button data-v="cams">Cameras</button>
+      <button data-v="live">Live view</button>
+      <button data-v="mira">Mira</button>
+      <button data-v="events">Alerts</button>
+      <button data-v="storage">Storage</button>
+      <button data-v="privacy">Privacy</button>
+      <button data-v="family">AI family</button>
+    </nav>
+    <p class="fine" id="ziva">Ziva: ready. Use the nav or #live / #mira.</p>
+  </aside>
+  <main>
+    <section id="dash" class="view on">
+      <h1>Operations dashboard</h1>
+      <p class="lead">Nexa coordinates cameras, recording, and health. Early Access uses this device camera plus simulated cameras. Real ONVIF/RTSP adapters come later.</p>
+      <div class="kpis">
+        <div><b id="k-cams">4</b> cameras</div>
+        <div><b id="k-rec">0</b> local stills</div>
+        <div><b id="k-al">0</b> alerts</div>
+        <div><b>local</b> storage</div>
+      </div>
+      <p id="health">Nira: system idle. Allow camera in Privacy, then open Live view.</p>
+    </section>
+
+    <section id="cams" class="view">
+      <h1>Camera compatibility</h1>
+      <p class="lead">Novi reports status instead of pretending every camera is identical.</p>
+      <ul class="list" id="cam-list"></ul>
+    </section>
+
+    <section id="live" class="view">
+      <h1>Live view</h1>
+      <p class="lead">This-device camera is Fully supported in the browser. Simulated cameras are demo-only.</p>
+      <div class="grid-sel">
+        Layout:
+        <button type="button" data-g="1" class="on">1 cam</button>
+        <button type="button" data-g="2">2 cam</button>
+        <button type="button" data-g="4">4 cam</button>
+      </div>
+      <p id="grid-warn" class="warn hidden">Four-camera view can raise CPU, RAM, GPU, network, battery, and temperature. Early Access shows placeholders for extra cams so this laptop is not overloaded.</p>
+      <div id="stage" class="stage g1">
+        <div class="tile live"><video id="vid" autoplay playsinline muted></video><span>This device</span></div>
+        <div class="tile sim" data-sim="shop">Shop entrance · sim</div>
+        <div class="tile sim" data-sim="gate">Gate · sim</div>
+        <div class="tile off">Roof · unsupported</div>
+      </div>
+      <div class="row">
+        <button type="button" id="start">Start camera</button>
+        <button type="button" id="stop">Stop</button>
+        <button type="button" id="snap">Snapshot</button>
+        <button type="button" id="rec">Record clip</button>
+        <button type="button" id="watch">Watch motion</button>
+        <button type="button" id="sim">Simulate human event</button>
+      </div>
+      <canvas id="cv" hidden></canvas>
+    </section>
+
+    <section id="mira" class="view">
+      <h1>Mira</h1>
+      <p class="lead">Warm, friendly assistant. Type a command. Voice replies are optional (browser speech).</p>
+      <div id="chat"></div>
+      <form id="mira-f">
+        <input id="mira-q" autocomplete="off" placeholder="Ask Mira… e.g. open live view" />
+        <button>Send</button>
+      </form>
+    </section>
+
+    <section id="events" class="view">
+      <h1>Alerts</h1>
+      <p class="lead">Kira reports uncertainty, not fake certainty. Tiny motion (insects, rain, noise) is filtered when Watch motion is on.</p>
+      <ul class="list" id="ev"></ul>
+    </section>
+
+    <section id="storage" class="view">
+      <h1>Local storage</h1>
+      <p class="lead">Luma: stills stay in this browser. Video clips download to this device. Cloud, Drive, and NAS are off in Early Access.</p>
+      <div class="row">
+        <button type="button" id="clear-stills">Clear stills</button>
+      </div>
+      <div id="thumbs"></div>
+      <ul class="list" id="clips-v"></ul>
+    </section>
+
+    <section id="privacy" class="view">
+      <h1>Privacy mode</h1>
+      <label><input type="checkbox" id="p-rec" checked /> Allow local snapshots and clips</label>
+      <label><input type="checkbox" id="p-ai" checked /> Allow motion / AI events</label>
+      <label><input type="checkbox" id="p-cam" /> Camera permission (browser will also ask)</label>
+      <label><input type="checkbox" id="p-voice" /> Speak Mira replies</label>
+      <p class="fine">No passwords stored. Face processing, cloud, Drive, and sharing are off. Originals stay on this device.</p>
+    </section>
+
+    <section id="family" class="view">
+      <h1>AI family</h1>
+      <ul class="fam">
+        <li><b>Mira</b> — main assistant, warm</li>
+        <li><b>Nexa</b> — operations, precise</li>
+        <li><b>Veya</b> — vision</li>
+        <li><b>Sora</b> — audio (later)</li>
+        <li><b>Kira</b> — security, alert</li>
+        <li><b>Luma</b> — storage</li>
+        <li><b>Raya</b> — lights (later)</li>
+        <li><b>Aira</b> — alarms (later)</li>
+        <li><b>Novi</b> — connectivity</li>
+        <li><b>Ziva</b> — instant launch</li>
+        <li><b>Nira</b> — diagnostics</li>
+        <li><b>Tavi</b> — testing</li>
+        <li><b>Coda</b> — developer</li>
+      </ul>
+    </section>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

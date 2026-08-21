@@ -1,0 +1,41 @@
+:root {
+  --bg: #071018;
+  --panel: #0c1822;
+  --line: #163040;
+  --cyan: #3ec8e8;
+  --ink: #e4eef4;
+  --mute: #8aa0ae;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: "Segoe UI", system-ui, sans-serif; }
+a { color: var(--cyan); }
+.wrap { max-width: 920px; margin: 0 auto; padding: 1.1rem 1.2rem 4rem; }
+header.top {
+  display: flex; flex-wrap: wrap; gap: .7rem 1rem; align-items: center;
+  justify-content: space-between; border-bottom: 1px solid var(--line);
+  padding-bottom: .8rem; margin-bottom: 1.6rem;
+}
+.brand { color: var(--ink); text-decoration: none; font-weight: 700; display: flex; align-items: center; gap: .5rem; }
+header.top nav a { color: var(--mute); text-decoration: none; margin-right: .75rem; font-size: .9rem; }
+header.top nav a:hover, header.top nav a.on { color: var(--cyan); }
+.cta { background: var(--cyan); color: #041018 !important; padding: .35rem .65rem; border-radius: 6px; font-weight: 650; }
+.kicker { color: var(--cyan); letter-spacing: .08em; font-size: .78rem; text-transform: uppercase; }
+h1 { font-size: clamp(1.7rem, 4vw, 2.5rem); font-weight: 600; margin: .3rem 0 1rem; }
+.lead { color: var(--mute); font-size: 1.08rem; max-width: 42rem; line-height: 1.5; }
+.grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .8rem; }
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+.card, .panel { background: var(--panel); border: 1px solid var(--line); padding: 1rem; border-radius: 10px; }
+.card h3, .panel h2 { margin: 0 0 .5rem; font-size: 1.05rem; }
+.card p, .panel p { color: var(--mute); margin: 0; font-size: .95rem; line-height: 1.45; }
+.badge { display: inline-block; font-size: .72rem; color: var(--cyan); letter-spacing: .04em; margin-bottom: .4rem; }
+.warn { background: #1a1408; border: 1px solid #5a4a20; color: #e6d7a8; padding: .8rem 1rem; border-radius: 8px; }
+ul.clean { color: var(--mute); padding-left: 1.1rem; }
+footer {
+  margin-top: 3rem; padding-top: 1rem; border-top: 1px solid var(--line);
+  color: var(--mute); font-size: .82rem;
+}
+footer a { margin-right: .7rem; }
+@media (max-width: 740px) {
+  .grid, .grid2 { grid-template-columns: 1fr; }
+  header.top nav a { display: inline-block; margin: .15rem .5rem .15rem 0; }
+}

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>API / plugins — UniVista</title>
+  <link rel="icon" href="web/icon-32.png" /><link rel="stylesheet" href="site.css" />
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <a class="brand" href="index.html"><img src="web/icon-64.png" width="32" height="32" alt="" /> UniVista</a>
+    <nav><a href="index.html">Home</a><a href="developers.html">Developers</a><a class="on" href="api.html">API</a><a class="cta" href="web/index.html">Open app</a></nav>
+  </header>
+  <h1>API / plugin documentation</h1>
+  <p class="lead">Adapters translate manufacturer systems (ONVIF, RTSP, Xiaomi, V380, Arlo, others) into UniVista’s common interface. Plugin and HTTP APIs are not public in Early Access.</p>
+  <p>Planned adapter contract (draft):</p>
+  <ul class="clean">
+    <li><code>discover()</code> — Novi</li>
+    <li><code>connect() / reconnect()</code></li>
+    <li><code>liveView()</code>, <code>record()</code>, <code>ptz()</code> where supported</li>
+    <li><code>compatibility()</code> → fully | partial | unsupported + limitation text</li>
+  </ul>
+  <p>Keys must never be logged in plaintext. AI must not hold unrestricted production credentials.</p>
+  <footer><a href="developers.html">Developers</a></footer>
+</div>
+</body>
+</html>
