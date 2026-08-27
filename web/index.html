@@ -30,7 +30,7 @@
   <main>
     <section id="dash" class="view on">
       <h1>Operations dashboard</h1>
-      <p class="lead">Nexa coordinates cameras, recording, and health. Early Access uses this device camera plus simulated cameras. Real ONVIF/RTSP adapters come later.</p>
+      <p class="lead">Nexa coordinates cameras, recording, and health. This-device camera works in the browser. LAN ONVIF/RTSP cameras need <strong>INSAN Bridge</strong> running on your PC.</p>
       <div class="kpis">
         <div><b id="k-cams">1</b> live + demos</div>
         <div><b id="k-rec">0</b> local stills</div>
@@ -42,13 +42,31 @@
 
     <section id="cams" class="view">
       <h1>Camera compatibility</h1>
-      <p class="lead">Novi reports status instead of pretending every camera is identical.</p>
+      <p class="lead">Novi reports status instead of pretending every camera is identical. Paste RTSP or discover ONVIF through INSAN Bridge (same Wi-Fi as this PC).</p>
+      <div class="row">
+        <input id="bridge-url" placeholder="Bridge URL e.g. http://127.0.0.1:8787" />
+        <button type="button" id="bridge-ping">Check bridge</button>
+      </div>
+      <p class="fine" id="bridge-st">Bridge: not checked.</p>
+      <div class="row">
+        <input id="rtsp-url" placeholder="rtsp://user:pass@192.168.1.20:554/stream1" />
+        <input id="cam-name" placeholder="Name" value="LAN camera" />
+        <button type="button" id="cam-rtsp">Add RTSP</button>
+      </div>
+      <div class="row">
+        <input id="onvif-host" placeholder="ONVIF IP or http://192.168.1.20" />
+        <input id="onvif-user" placeholder="user" />
+        <input id="onvif-pass" placeholder="password" type="password" />
+        <button type="button" id="cam-discover">Discover ONVIF</button>
+        <button type="button" id="cam-onvif">Add ONVIF</button>
+      </div>
+      <ul class="list" id="found-list"></ul>
       <ul class="list" id="cam-list"></ul>
     </section>
 
     <section id="live" class="view">
       <h1>Live view</h1>
-      <p class="lead">This-device camera is Fully supported in the browser. Simulated cameras are demo-only.</p>
+      <p class="lead">This-device camera is Fully supported in the browser. Network cameras appear when INSAN Bridge is connected.</p>
       <div class="grid-sel">
         Layout:
         <button type="button" data-g="1" class="on">1 cam</button>
@@ -58,9 +76,9 @@
       <p id="grid-warn" class="warn hidden">Four-camera view can raise CPU, RAM, GPU, network, battery, and temperature. Early Access shows placeholders for extra cams so this laptop is not overloaded.</p>
       <div id="stage" class="stage g1">
         <div class="tile live"><video id="vid" autoplay playsinline muted></video><span>This device</span></div>
-        <div class="tile sim" data-sim="shop">Shop entrance · sim</div>
-        <div class="tile sim" data-sim="gate">Gate · sim</div>
-        <div class="tile off">Roof · unsupported</div>
+        <div class="tile sim" data-sim="shop">Shop entrance · sim (placeholder)</div>
+        <div class="tile sim" data-sim="gate">Gate · sim (placeholder)</div>
+        <div class="tile off" id="net-slot">LAN camera · add from Cameras</div>
       </div>
       <div class="row">
         <button type="button" id="start">Start camera</button>
@@ -75,7 +93,7 @@
 
     <section id="mira" class="view">
       <h1>Mira</h1>
-      <p class="lead">Warm, friendly assistant. Type a command. Voice replies are optional (browser speech).</p>
+      <p class="lead">Warm, friendly assistant. With INSAN Bridge + XAI_API_KEY she uses SpaceXAI. Without it she uses on-device commands.</p>
       <div id="chat"></div>
       <form id="mira-f">
         <input id="mira-q" autocomplete="off" placeholder="Ask Mira… e.g. open live view" />
@@ -127,6 +145,7 @@
       </ul>
     </section>
   </main>
+  <script src="bridge-client.js"></script>
   <script src="app.js"></script>
   <script src="https://sl8722569-ux.github.io/insan-creations/js/stats.js" data-app="univista"></script>
 </body>

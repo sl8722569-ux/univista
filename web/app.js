@@ -14,9 +14,9 @@
   const cameras = [
     { name: "This device", status: "Fully supported", note: "Browser camera via getUserMedia." },
     { name: "Shop entrance (sim)", status: "Simulated", note: "Demo camera. No physical device." },
-    { name: "Gate (sim)", status: "Simulated", note: "Demo camera. No physical device." },
-    { name: "Roof (example)", status: "Unsupported", note: "No adapter yet. UniVista will explain limits instead of faking support." }
+    { name: "Gate (sim)", status: "Simulated", note: "Demo camera. No physical device." }
   ];
+  const netCams = [];
 
   function savePriv() {
     localStorage.setItem("uv-priv", JSON.stringify({
@@ -53,9 +53,73 @@
   window.addEventListener("hashchange", route);
   route();
 
-  $("cam-list").innerHTML = cameras.map((c) =>
-    "<li><b>" + c.name + "</b> — " + c.status + "<br>" + c.note + "</li>"
-  ).join("");
+  function paintCams() {
+    $("cam-list").innerHTML = cameras.concat(netCams).map((c) =>
+      "<li><b>" + c.name + "</b> — " + c.status + "<br>" + c.note + "</li>"
+    ).join("");
+    $("k-cams").textContent = String(1 + netCams.length);
+    const slot = $("net-slot");
+    if (slot && netCams[0]) {
+      slot.className = "tile live";
+      slot.innerHTML = '<img class="net" alt="" src="' + netCams[0].mjpeg + '"><span>' + netCams[0].name + "</span>";
+    }
+  }
+  paintCams();
+
+  async function useBridge() {
+    const typed = ($("bridge-url").value || "").trim();
+    if (typed && window.INSAN_BRIDGE) window.INSAN_BRIDGE.setUrl(typed);
+    const found = window.INSAN_BRIDGE ? await window.INSAN_BRIDGE.find() : null;
+    if (found) {
+      $("bridge-url").value = found.base;
+      const ai = found.health.ai ? "SpaceXAI on" : "SpaceXAI off (set XAI_API_KEY in bridge/.env)";
+      $("bridge-st").textContent = "Bridge OK · " + ai + " · ffmpeg " + (found.health.ffmpeg ? "yes" : "no") +
+        (found.health.lan && found.health.lan[0] ? " · LAN " + found.health.lan[0] + ":" + found.health.port : "");
+      return found.base;
+    }
+    $("bridge-st").textContent = "Bridge offline. Start Open-INSAN-Bridge.bat on the PC. Phone: use http://PC-LAN-IP:8787";
+    return null;
+  }
+  $("bridge-url").value = (window.INSAN_BRIDGE && window.INSAN_BRIDGE.url()) || "http://127.0.0.1:8787";
+  $("bridge-ping").onclick = () => { useBridge(); };
+  useBridge();
+
+  $("cam-discover").onclick = async () => {
+    const base = await useBridge();
+    if (!base) return;
+    try {
+      const j = await window.INSAN_BRIDGE.get("/onvif/discover");
+      const list = j.devices || [];
+      $("found-list").innerHTML = list.length
+        ? list.map((d) => "<li><b>" + d.ip + "</b><br>" + (d.xaddrs || "ONVIF probe reply") + "</li>").join("")
+        : "<li>No ONVIF probes answered. Paste RTSP if you know the URL.</li>";
+      addEvent("Novi: ONVIF discovery returned " + list.length + " device(s).");
+    } catch (e) {
+      $("found-list").innerHTML = "<li>" + e.message + "</li>";
+    }
+  };
+  async function addNet(body) {
+    const base = await useBridge();
+    if (!base) return;
+    try {
+      const j = await window.INSAN_BRIDGE.post("/onvif/connect", body);
+      const mjpeg = base + j.mjpeg;
+      netCams.unshift({ name: j.name, status: "Live · " + j.kind, note: "MJPEG via INSAN Bridge.", mjpeg: mjpeg, id: j.id });
+      paintCams();
+      addEvent("Novi: connected " + j.name + " (" + j.kind + ").");
+      $("health").textContent = "Novi: " + j.name + " streaming through the bridge.";
+    } catch (e) {
+      $("health").textContent = "Novi: " + e.message;
+      addEvent("Novi: camera connect failed — " + e.message);
+    }
+  }
+  $("cam-rtsp").onclick = () => addNet({ name: $("cam-name").value || "RTSP", rtsp: $("rtsp-url").value });
+  $("cam-onvif").onclick = () => addNet({
+    name: $("cam-name").value || "ONVIF",
+    host: $("onvif-host").value,
+    user: $("onvif-user").value,
+    password: $("onvif-pass").value
+  });
 
   function addEvent(text) {
     events.unshift(new Date().toLocaleString() + " — " + text);
@@ -63,6 +127,7 @@
     render();
   }
   function render() {
+    $("k-cams").textContent = String(1 + netCams.length);
     $("k-rec").textContent = String(clips.length);
     $("k-al").textContent = String(events.length);
     $("ev").innerHTML = events.slice(0, 20).map((e) => "<li>" + e + "</li>").join("") || "<li>No alerts.</li>";
@@ -244,8 +309,8 @@
     chat.scrollTop = chat.scrollHeight;
     speak(t);
   }
-  miraSay("Hi. I can open live view, save a still, record a clip, or explain an agent. I will not claim a detection is certain.");
-  $("mira-f").onsubmit = (e) => {
+  miraSay("Hi. I can open live view, save a still, record a clip, or explain an agent. SpaceXAI turns on when INSAN Bridge is running with XAI_API_KEY.");
+  $("mira-f").onsubmit = async (e) => {
     e.preventDefault();
     const q = $("mira-q").value.trim();
     if (!q) return;
@@ -254,15 +319,31 @@
     chat.appendChild(p);
     $("mira-q").value = "";
     const low = q.toLowerCase();
-    let a = "I can open Live view, save a local still, record a clip, or explain an agent. Cloud and Drive are off in Early Access.";
-    if (/live|camera|open/.test(low)) { a = "Opening Live view. Use Start camera — Novi labels this device Fully supported."; show("live"); }
-    else if (/dash/.test(low)) { a = "Opening the operations dashboard for Nexa."; show("dash"); }
-    else if (/privacy|stop recording|off/.test(low)) { a = "Privacy can disable snapshots, clips, and AI events. Originals stay on this device."; show("privacy"); }
+    if (/live|camera|open/.test(low)) show("live");
+    else if (/dash/.test(low)) show("dash");
+    else if (/privacy/.test(low)) show("privacy");
+    else if (/luma|storage|clip|snapshot/.test(low)) show("storage");
+    if (window.INSAN_BRIDGE) {
+      try {
+        const found = await window.INSAN_BRIDGE.find();
+        if (found && found.health.ai) {
+          const text = await window.INSAN_BRIDGE.chat("mira", q);
+          miraSay(text);
+          return;
+        }
+      } catch (err) {
+        miraSay("Bridge/SpaceXAI error: " + err.message + " Falling back to on-device commands.");
+      }
+    }
+    let a = "I can open Live view, save a local still, record a clip, or add a LAN camera from Cameras. Start INSAN Bridge for SpaceXAI.";
+    if (/live|camera|open/.test(low)) a = "Opening Live view. Use Start camera for this device, or Cameras → RTSP/ONVIF with the bridge.";
+    else if (/dash/.test(low)) a = "Opening the operations dashboard for Nexa.";
+    else if (/privacy|stop recording|off/.test(low)) a = "Privacy can disable snapshots, clips, and AI events. Originals stay on this device.";
     else if (/kira|security|zone/.test(low)) a = "Kira is security AI: zones and after-hours rules later. Today: alerts with uncertainty, never fake certainty.";
     else if (/veya|human|motion|detect/.test(low)) a = "Veya watches locally if you tap Watch motion. Tiny insects and noise are filtered. Person-scale motion is reported as possible, not certain.";
-    else if (/luma|storage|clip|snapshot/.test(low)) { a = "Luma keeps stills in this browser. Clips download to this device. No cloud yet."; show("storage"); }
+    else if (/luma|storage|clip|snapshot/.test(low)) a = "Luma keeps stills in this browser. Clips download to this device. No cloud yet.";
     else if (/nexa/.test(low)) a = "Nexa is operations: cameras, recording, health. This dashboard is her Early Access surface.";
-    else if (/novi|onvif|rtsp|xiaomi|arlo|v380/.test(low)) a = "Novi will add ONVIF, RTSP, and manufacturer adapters later. Status will be Fully, Partial, or Unsupported with an explanation.";
+    else if (/novi|onvif|rtsp|xiaomi|arlo|v380/.test(low)) a = "Novi: run INSAN Bridge, then Cameras → Discover ONVIF or paste RTSP. UniVista learns the camera instead of forcing a brand app.";
     else if (/raya|light|colour|color/.test(low)) a = "Raya will control compatible RGB lights later. Early Access does not change your bulbs.";
     else if (/aira|alarm/.test(low)) a = "Aira will play custom alarms later. Not armed in Early Access.";
     else if (/ziva|fast|launch/.test(low)) a = "Ziva opens views quickly. Try #live or #mira in the address bar, or Install as an app.";

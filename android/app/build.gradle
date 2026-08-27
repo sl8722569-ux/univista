@@ -1,0 +1,30 @@
+plugins {
+  id 'com.android.application'
+}
+android {
+  namespace 'creations.insan.univista'
+  compileSdk 34
+  defaultConfig {
+    applicationId "creations.insan.univista"
+    minSdk 24
+    targetSdk 34
+    versionCode 1
+    versionName "1.0-ea"
+    buildConfigField "String", "WEB_URL", "\"https://sl8722569-ux.github.io/univista/web/\""
+  }
+  buildFeatures { buildConfig true }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+  buildTypes {
+    debug { debuggable true }
+    release {
+      minifyEnabled false
+      signingConfig signingConfigs.debug
+    }
+  }
+}
+
+dependencies {}
+
